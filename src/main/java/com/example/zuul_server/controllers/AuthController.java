@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
@@ -53,11 +52,11 @@ public class AuthController {
 			model.put("_id",this.users.findByEmail(username).getId());
 			model.put("firstName",this.users.findByEmail(username).getFirstName());
 			model.put("lastName",this.users.findByEmail(username).getLastName());
-			model.put("createdDate",new Date());
+			model.put("createdDate",this.users.findByEmail(username).getCreatedDate());
 			model.put("roles",this.users.findByEmail(username).getRoles());
 			return ok(model);
 		} catch (AuthenticationException e) {
-			throw new BadCredentialsException("Invalid email/password supplied");
+			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
 	}
 
