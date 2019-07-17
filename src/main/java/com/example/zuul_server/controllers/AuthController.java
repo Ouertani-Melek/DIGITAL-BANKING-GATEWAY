@@ -99,6 +99,7 @@ public class AuthController {
         emailSenderService.sendEmail(mailMessage);
 
 
+<<<<<<< Updated upstream
         Map<Object, Object> model = new HashMap<>();
         model.put("message", "User registered successfully");
         return ok(model);
@@ -120,6 +121,39 @@ public class AuthController {
         }
         return ok(model);
     }
+=======
+		Map<Object, Object> model = new HashMap<>();
+		model.put("message", "User registered successfully");
+		return ok(model);
+	}
+
+
+	@RequestMapping(value="/confirm-account/{token}", method= {RequestMethod.GET})
+	public ResponseEntity confirmUserAccount(@PathVariable("token")String confirmationToken)
+	{
+		ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+		Map<Object, Object> model = new HashMap<>();
+
+		if(token != null)
+		{
+			User user = users.findByEmail(token.getUser().getEmail());
+			user.setId(token.getUser().getId());
+
+			user.setActivated(true);
+			users.save(user);
+
+			model.put("message", "User registered successfully");
+
+		}
+		else
+		{
+			model.put("message","The link is invalid or broken!");
+
+		}
+
+		return ok(model);
+	}
+>>>>>>> Stashed changes
 
 
 }
