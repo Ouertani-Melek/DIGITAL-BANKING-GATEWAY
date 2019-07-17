@@ -1,13 +1,17 @@
 package com.example.zuul_server.controllers;
 
 import com.example.zuul_server.config.JwtTokenProvider;
+import com.example.zuul_server.models.ConfirmationToken;
 import com.example.zuul_server.models.User;
+import com.example.zuul_server.repositories.ConfirmationTokenRepository;
 import com.example.zuul_server.repositories.RoleRepository;
 import com.example.zuul_server.repositories.UserRepository;
 import com.example.zuul_server.services.CustomUserDetailsService;
+import com.example.zuul_server.services.EmailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -25,6 +29,9 @@ import static org.springframework.http.ResponseEntity.ok;
 public class AuthController {
 
 	@Autowired
+	private ConfirmationTokenRepository confirmationTokenRepository;
+
+	@Autowired
     AuthenticationManager authenticationManager;
 
 	@Autowired
@@ -32,6 +39,10 @@ public class AuthController {
 
 	@Autowired
 	UserRepository users;
+
+
+	@Autowired
+	private EmailSenderService emailSenderService;
 
 	@Autowired
 	private RoleRepository roles;
@@ -70,8 +81,47 @@ public class AuthController {
 		user.setRoles(new HashSet<>());
 		user.getRoles().add(roles.findByRole("USER"));
 		userService.saveUser(user);
+
+		ConfirmationToken confirmationToken = new ConfirmationToken(user);
+		confirmationTokenRepository.save(confirmationToken);
+		SimpleMailMessage mailMessage = new SimpleMailMessage();
+		mailMessage.setTo(user.getEmail());
+		mailMessage.setFrom("ouertanimelek@gmail.com");
+		mailMessage.setText("To confirm your account please click here :" +"http://localhost:8084/api/auth/confirm-account/"+confirmationToken.getConfirmationToken());
+        emailSenderService.sendEmail(mailMessage);
+
+
 		Map<Object, Object> model = new HashMap<>();
 		model.put("message", "User registered successfully");
 		return ok(model);
 	}
+
+
+	@RequestMapping(value="/confirm-account/{token}", method= {RequestMethod.PUT,})
+	public ResponseEntity confirmUserAccount(@PathVariable("token")String confirmationToken)
+	{
+		ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+		Map<Object, Object> model = new HashMap<>();
+
+		if(token != null)
+		{
+			User user = users.findByEmail(token.getUser().getEmail());
+			user.setId(token.getUser().getId());
+
+			user.setActivated(true);
+			users.save(user);
+
+			model.put("message", "User registered successfully");
+
+		}
+		else
+		{
+			model.put("message","The link is invalid or broken!");
+
+		}
+
+		return ok(model);
+	}
+
+
 }

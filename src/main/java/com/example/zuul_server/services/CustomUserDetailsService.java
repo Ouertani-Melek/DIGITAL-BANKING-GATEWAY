@@ -34,6 +34,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 	public void saveUser(User user) {
 	    user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 	    user.setEnabled(true);
+	    user.setActivated(false);
 	    userRepository.save(user);
 	}
 	
