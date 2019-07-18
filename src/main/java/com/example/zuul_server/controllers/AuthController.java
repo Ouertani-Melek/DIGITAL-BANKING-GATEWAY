@@ -25,7 +25,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
+    private static final String TYPEMESSAGE = "message";
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
 
@@ -95,7 +95,7 @@ public class AuthController {
         mailMessage.setText("To confirm your account please click here :" + "http://localhost:8084/api/auth/confirm-account/" + confirmationToken.getConfirmationToken());
         emailSenderService.sendEmail(mailMessage);
         Map<Object, Object> model = new HashMap<>();
-        model.put("message", "User registered successfully");
+        model.put(TYPEMESSAGE, "User registered successfully");
         return ok(model);
     }
 
@@ -109,9 +109,9 @@ public class AuthController {
             user.setId(token.getUser().getId());
             user.setActivated(true);
             users.save(user);
-            model.put("message", "User registered successfully");
+            model.put(TYPEMESSAGE, "User registered successfully");
         } else {
-            model.put("message", "The link is invalid or broken!");
+            model.put(TYPEMESSAGE, "The link is invalid or broken!");
         }
         return ok(model);
     }
