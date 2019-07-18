@@ -70,7 +70,7 @@ public class JwtTokenProvider {
                 return false;
             }
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (Exception e) {
             return false;
         }
     }

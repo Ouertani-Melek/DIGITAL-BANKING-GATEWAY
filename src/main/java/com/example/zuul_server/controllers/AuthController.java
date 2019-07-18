@@ -71,7 +71,7 @@ public class AuthController {
             model.put("createdDate", user.getCreatedDate());
             model.put("roles", user.getRoles());
             return ok(model);
-        } catch (AuthenticationException e) {
+        } catch (Exception e) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
     }
