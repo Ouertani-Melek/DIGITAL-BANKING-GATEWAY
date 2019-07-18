@@ -16,8 +16,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -88,7 +86,6 @@ public class AuthController {
         user.setRoles(new HashSet<>());
         user.getRoles().add(roles.findByRole("USER"));
         userService.saveUser(user);
-
         //sending confirmation  mail
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
         confirmationTokenRepository.save(confirmationToken);
@@ -97,9 +94,6 @@ public class AuthController {
         mailMessage.setFrom("ouertanimelek@gmail.com");
         mailMessage.setText("To confirm your account please click here :" + "http://localhost:8084/api/auth/confirm-account/" + confirmationToken.getConfirmationToken());
         emailSenderService.sendEmail(mailMessage);
-
-
-<<<<<<< Updated upstream
         Map<Object, Object> model = new HashMap<>();
         model.put("message", "User registered successfully");
         return ok(model);
@@ -117,43 +111,10 @@ public class AuthController {
             users.save(user);
             model.put("message", "User registered successfully");
         } else {
-            return new ResponseEntity<String>("The link is invalid or broken!", HttpStatus.BAD_REQUEST);
+            model.put("message", "The link is invalid or broken!");
         }
         return ok(model);
     }
-=======
-		Map<Object, Object> model = new HashMap<>();
-		model.put("message", "User registered successfully");
-		return ok(model);
-	}
-
-
-	@RequestMapping(value="/confirm-account/{token}", method= {RequestMethod.GET})
-	public ResponseEntity confirmUserAccount(@PathVariable("token")String confirmationToken)
-	{
-		ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
-		Map<Object, Object> model = new HashMap<>();
-
-		if(token != null)
-		{
-			User user = users.findByEmail(token.getUser().getEmail());
-			user.setId(token.getUser().getId());
-
-			user.setActivated(true);
-			users.save(user);
-
-			model.put("message", "User registered successfully");
-
-		}
-		else
-		{
-			model.put("message","The link is invalid or broken!");
-
-		}
-
-		return ok(model);
-	}
->>>>>>> Stashed changes
 
 
 }
