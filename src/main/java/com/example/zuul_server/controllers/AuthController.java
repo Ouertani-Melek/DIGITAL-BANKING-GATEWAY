@@ -15,7 +15,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.core.AuthenticationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody AuthBody data) {
+    public ResponseEntity login(@RequestBody AuthBody data){
         try {
             String username = data.getEmail();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
@@ -76,9 +76,8 @@ public class AuthController {
             model.put("createdDate", user.getCreatedDate());
             model.put("roles", user.getRoles());
             return ok(model);
-        } catch (Exception e) {
-            logger.info("context");
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } catch (AuthenticationException e) {
+            throw e;
         }
     }
 

@@ -71,7 +71,7 @@ public class JwtTokenProvider {
             }
             return true;
         } catch (Exception e) {
-            return false;
+            throw e;
         }
     }
 }
