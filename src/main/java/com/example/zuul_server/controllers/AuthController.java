@@ -96,7 +96,7 @@ public class AuthController {
         confirmationTokenRepository.save(confirmationToken);
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
-        mailMessage.setFrom("ouertanimelek@gmail.com");
+        mailMessage.setFrom("biat.stage@gmail.com");
         mailMessage.setText("To confirm your account please click here :" + "http://localhost:8084/api/auth/confirm-account/" + confirmationToken.getConfirmationToken());
         emailSenderService.sendEmail(mailMessage);
         Map<Object, Object> model = new HashMap<>();
