@@ -14,11 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -26,6 +29,8 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequestMapping("/api/auth")
 public class AuthController {
     private static final String TYPEMESSAGE = "message";
+    Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
 
@@ -72,6 +77,7 @@ public class AuthController {
             model.put("roles", user.getRoles());
             return ok(model);
         } catch (Exception e) {
+            logger.info("context");
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
     }
