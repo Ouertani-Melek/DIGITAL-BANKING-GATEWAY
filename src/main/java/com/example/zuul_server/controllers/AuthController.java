@@ -68,7 +68,7 @@ public class AuthController {
             }
             String token = jwtTokenProvider.createToken(username, this.users.findByEmail(username).getRoles());
             Map<Object, Object> model = new HashMap<>();
-            model.put("username", username);
+            model.put("email", username);
             model.put("token", token);
             model.put("_id", user.getId());
             model.put("firstName", user.getFirstName());
@@ -97,7 +97,7 @@ public class AuthController {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
         mailMessage.setFrom("biat.stage@gmail.com");
-        mailMessage.setText("To confirm your account please click here :" + "http://localhost:8084/api/auth/confirm-account/" + confirmationToken.getConfirmationToken());
+        mailMessage.setText("To confirm your account please click here : " + "http://localhost:8084/api/auth/confirm-account/" + confirmationToken.getConfirmationToken());
         emailSenderService.sendEmail(mailMessage);
         Map<Object, Object> model = new HashMap<>();
         model.put(TYPEMESSAGE, "User registered successfully");
@@ -106,7 +106,7 @@ public class AuthController {
 
 
     @RequestMapping(value = "/confirm-account/{token}", method = {RequestMethod.GET})
-    public ResponseEntity confirmUserAccount(@PathVariable("token") String confirmationToken) {
+    public String confirmUserAccount(@PathVariable("token") String confirmationToken) {
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
         Map<Object, Object> model = new HashMap<>();
         if (token != null) {
@@ -114,11 +114,110 @@ public class AuthController {
             user.setId(token.getUser().getId());
             user.setActivated(true);
             users.save(user);
-            model.put(TYPEMESSAGE, "User registered successfully");
+            return htmlContent("Vous pouvez vous connectez avec votre compte désormais ...");
         } else {
-            model.put(TYPEMESSAGE, "The link is invalid or broken!");
+            return htmlContent("Token de confirmation est invalide");
         }
-        return ok(model);
+    }
+
+    private String htmlContent(String content){
+
+        return  "<html>\n" +
+                "  <head>\n" +
+                "   <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\">\n" +
+                "   <style>\n" +
+                "      a,a:focus,a:hover {\n" +
+                "        color: #fff;\n" +
+                "      }\n" +
+                "      .btn-secondary,\n" +
+                "      .btn-secondary:hover,\n" +
+                "      .btn-secondary:focus {\n" +
+                "        color: #333;\n" +
+                "        text-shadow: none; /* Prevent inheritance from `body` */\n" +
+                "        background-color: #fff;\n" +
+                "        border: .05rem solid #fff;\n" +
+                "      }\n" +
+                "      body {\n" +
+                "        display: -ms-flexbox;\n" +
+                "        display: flex;\n" +
+                "        color: #fff;\n" +
+                "        text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);\n" +
+                "        box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);\n" +
+                "        background-image: url('https://i.ibb.co/6Ff6yzQ/404.jpg');\n" +
+                "        background-size: 100% 100%;\n" +
+                "      }\n" +
+                "      .cover-container {\n" +
+                "        max-width: 42em;\n" +
+                "      }\n" +
+                "      .masthead {\n" +
+                "        margin-bottom: 2rem;\n" +
+                "      }\n" +
+                "      .masthead-brand {\n" +
+                "        margin-bottom: 0;\n" +
+                "      }\n" +
+                "      .nav-masthead .nav-link {\n" +
+                "        padding: .25rem 0;\n" +
+                "        font-weight: 700;\n" +
+                "        color: rgba(255, 255, 255, .5);\n" +
+                "        background-color: transparent;\n" +
+                "        border-bottom: .25rem solid transparent;\n" +
+                "      }\n" +
+                "      .nav-masthead .nav-link:hover,\n" +
+                "      .nav-masthead .nav-link:focus {\n" +
+                "        border-bottom-color: rgba(255, 255, 255, .25);\n" +
+                "      }\n" +
+                "      .nav-masthead .nav-link + .nav-link {\n" +
+                "        margin-left: 1rem;\n" +
+                "      }\n" +
+                "      .nav-masthead .active {\n" +
+                "        color: #fff;\n" +
+                "        border-bottom-color: #fff;\n" +
+                "      }\n" +
+                "      @media (min-width: 48em) {\n" +
+                "        .masthead-brand {\n" +
+                "          float: left;\n" +
+                "        }\n" +
+                "        .nav-masthead {\n" +
+                "          float: right;\n" +
+                "        }\n" +
+                "      }\n" +
+                "      .cover {\n" +
+                "        padding: 0 1.5rem;\n" +
+                "      }\n" +
+                "      .cover .btn-lg {\n" +
+                "        padding: .75rem 1.25rem;\n" +
+                "        font-weight: 700;\n" +
+                "      }\n" +
+                "      .mastfoot {\n" +
+                "        color: rgba(255, 255, 255, .5);\n" +
+                "      }\n" +
+                "          </style>\n" +
+                "  </head>\n" +
+                "<body>\n" +
+                "  <div class=\"cover-container d-flex w-100 h-100 p-3 mx-auto flex-column\">\n" +
+                "    <header class=\"masthead mb-auto\">\n" +
+                "      <div class=\"inner\">\n" +
+                "        <img src=\"https://i.ibb.co/D9tVXrj/biat.png\" class=\"img-fluid masthead-brand\" style=\" width:50px;height: 50px\"/>\n" +
+                "  \n" +
+                "      </div>\n" +
+                "    </header>\n" +
+                "  \n" +
+                "    <main role=\"main\" class=\"inner cover\" style=\"margin-top : 150px\">\n" +
+                "      <h1 class=\"cover-heading\">Validation de compte</h1>\n" +
+                "      <p class=\"lead\">"+content+"</p>\n" +
+                "      <p class=\"lead\" style=\"margin-top : 150px\">\n" +
+                "          <a href=\"http://localhost:4200/login\" class=\"btn btn-lg btn-secondary\">Page Accueil</a>\n" +
+                "      </p>\n" +
+                "    </main>\n" +
+                "  \n" +
+                "    <footer class=\"mastfoot mt-auto\">\n" +
+                "      <div class=\"inner\">\n" +
+                "  \n" +
+                "      </div>\n" +
+                "    </footer>\n" +
+                "  </div>\n" +
+                "  </body>\n" +
+                "</html>";
     }
 
 
