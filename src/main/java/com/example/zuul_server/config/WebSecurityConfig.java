@@ -39,9 +39,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.and().authorizeRequests()
 				.antMatchers("/api/auth/login").permitAll()
 				.antMatchers("/api/auth/register").permitAll()
-				.antMatchers("/api/auth/register").permitAll()
-				.antMatchers("/user-service/**").hasAuthority("ADMIN")
-				.antMatchers("/account-service/**").hasAuthority("ADMIN")
+				.antMatchers("/user-service/api/simpleUser/**").hasAuthority("USER")
+				.antMatchers("/user-service/**","/account-service/**").hasAuthority("ADMIN")
 				.and().cors()
 				.and().exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint()).and()
 				.apply(new JwtConfigurer(jwtTokenProvider));

@@ -75,6 +75,9 @@ public class AuthController {
             model.put("lastName", user.getLastName());
             model.put("createdDate", user.getCreatedDate());
             model.put("roles", user.getRoles());
+            model.put("activated", user.isActivated());
+            model.put("enabled", user.isEnabled());
+            model.put("password", user.getPassword());
             return ok(model);
         } catch (AuthenticationException e) {
             throw e;
